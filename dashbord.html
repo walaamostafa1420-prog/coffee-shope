@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Étoile Coffee Dashboard</title>
+
+    <link rel="stylesheet" href="coffee.css">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #f5f0e8;
+            color: #210e02;
+        }
+
+        .dashboard-header {
+            background: #160b06;
+            color: #D4AF37;
+            padding: 22px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .dashboard-header a {
+            color: #D4AF37;
+            text-decoration: none;
+        }
+
+        .dashboard-content {
+            padding: 35px 5%;
+        }
+
+        .dashboard-content h2 {
+            margin-bottom: 8px;
+        }
+
+        .dashboard-content > p {
+            color: #7a6142;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            border-left: 5px solid #D4AF37;
+            box-shadow: 0 4px 15px #210e0210;
+        }
+
+        .stat-card i {
+            color: #7a6142;
+            font-size: 25px;
+        }
+
+        .stat-card h3 {
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0 0;
+        }
+
+        .products-panel {
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 4px 15px #210e0210;
+        }
+
+        .products-panel h2 {
+            margin-top: 0;
+        }
+
+        .api-button {
+            background: #210e02;
+            color: #D4AF37;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 12px 0;
+        }
+
+        .api-button:hover {
+            background: #7a6142;
+            color: white;
+        }
+
+        #api-status {
+            color: #7a6142;
+            margin: 10px 0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 14px 10px;
+            border-bottom: 1px solid #eee5da;
+        }
+
+        th {
+            color: #7a6142;
+        }
+
+        @media (max-width: 700px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-content {
+                padding: 25px 4%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="dashboard-header">
+        <h1>
+            <i class="fa-solid fa-mug-hot"></i>
+            Étoile Coffee
+        </h1>
+
+        <a href="coffee.html">
+            <i class="fa-solid fa-house"></i>
+            Back to Website
+        </a>
+    </header>
+
+    <main class="dashboard-content">
+        <h2>Dashboard Overview ☕</h2>
+        <p>Welcome to your coffee shop dashboard.</p>
+
+        <section class="stats">
+            <article class="stat-card">
+                <i class="fa-solid fa-box"></i>
+                <h3>Total Products</h3>
+                <p id="product-count">0</p>
+            </article>
+
+            <article class="stat-card">
+                <i class="fa-solid fa-dollar-sign"></i>
+                <h3>Product Prices</h3>
+                <p id="average-price">$0</p>
+            </article>
+
+            <article class="stat-card">
+                <i class="fa-solid fa-plug"></i>
+                <h3>API Status</h3>
+                <p id="api-result" style="font-size: 18px;">
+                    Not checked
+                </p>
+            </article>
+        </section>
+
+        <section class="products-panel">
+            <h2>Products from API</h2>
+
+            <p>
+                Click the button to fetch JSON data from a public API.
+            </p>
+
+            <button class="api-button" id="fetch-button">
+                <i class="fa-solid fa-download"></i>
+                Fetch API Data
+            </button>
+
+            <p id="api-status" role="status">
+                Waiting to fetch data...
+            </p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="products-table">
+                        <tr>
+                            <td colspan="3">
+                                No data loaded yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const fetchButton = document.getElementById("fetch-button");
+
+        fetchButton.addEventListener("click", async function () {
+            const status = document.getElementById("api-status");
+            const result = document.getElementById("api-result");
+            const table = document.getElementById("products-table");
+
+            status.textContent = "Loading data...";
+            result.textContent = "Checking...";
+
+            fetchButton.disabled = true;
+
+            try {
+                const response = await fetch(
+                    "https://fakestoreapi.com/products"
+                );
+
+                if (!response.ok) {
+                    throw new Error("HTTP error: " + response.status);
+                }
+
+                const data = await response.json();
+
+                if (
+                    !Array.isArray(data) ||
+                    !data.every(
+                        item =>
+                            Number.isInteger(item.id) &&
+                            typeof item.title === "string" &&
+                            Number.isFinite(item.price)
+                    )
+                ) {
+                    throw new Error("Invalid JSON data structure");
+                }
+
+                table.innerHTML = "";
+
+                data.forEach(product => {
+                    const row = document.createElement("tr");
+
+                    const idCell = document.createElement("td");
+                    idCell.textContent = product.id;
+
+                    const nameCell = document.createElement("td");
+                    nameCell.textContent = product.title;
+
+                    const priceCell = document.createElement("td");
+                    priceCell.textContent =
+                        "$" + product.price.toFixed(2);
+
+                    row.append(idCell, nameCell, priceCell);
+                    table.appendChild(row);
+                });
+
+                const average =
+                    data.reduce((sum, item) => sum + item.price, 0)
+                    / data.length;
+
+                document.getElementById("product-count").textContent =
+                    data.length;
+
+                document.getElementById("average-price").textContent =
+                    "$" + average.toFixed(2);
+
+                result.textContent = "Connected";
+                status.textContent =
+                    "Success! JSON validated and " +
+                    data.length +
+                    " products loaded.";
+
+            } catch (error) {
+                result.textContent = "Failed";
+                status.textContent =
+                    "Could not load valid API data. " + error.message;
+
+            } finally {
+                fetchButton.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Online</title>
+<link rel="stylesheet" href="coffee.css">
+
+<style>
+
+body{
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.order-box{
+background:white;
+padding:30px;
+border-radius:15px;
+width:400px;
+text-align:center;
+}
+
+.order-box h2{
+color:#2b1404;
+margin-bottom:20px;
+}
+
+select,input{
+width:100%;
+padding:10px;
+margin:10px 0;
+border-radius:8px;
+}
+
+button{
+width:100%;
+padding:10px;
+background:#2b1404;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+button:hover{
+background:#7a6142;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="order-box">
+
+<h2>Order Online</h2>
+
+<select id="coffee">
+
+<option>Colombian Supremo</option>
+
+<option>Vanilla Coffee Shake</option>
+
+<option>Arabic Coffee</option>
+
+</select>
+
+<input type="number" id="qty" placeholder="Quantity">
+
+<button onclick="orderCoffee()">Place Order</button>
+
+<br><br>
+
+<a href="coffee.html">⬅ Back to Home</a>
+
+</div>
+
+<script>
+
+function orderCoffee(){
+
+let coffee=document.getElementById("coffee").value;
+
+let qty=document.getElementById("qty").value;
+
+if(qty==""){
+alert("Please enter quantity");
+return;
+}
+
+alert("Your order has been placed!\n\nCoffee: "+coffee+"\nQuantity: "+qty);
+
+}
+
+</script>
+
+</body>
+
+</html>
